@@ -20,6 +20,8 @@ services:
       POSTGRES_USER: ${DATABASE_USER:-postgres}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-example}
       POSTGRES_DB: ${DATABASE_NAME:-dbest}
+    ports:
+      - "5432:5432"
     volumes:
       - database:/var/lib/postgresql/data
 

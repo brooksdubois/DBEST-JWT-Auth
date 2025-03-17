@@ -2,7 +2,7 @@ import { drizzle as drizzlePostgres } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { drizzle as drizzlePGLite } from 'drizzle-orm/pglite';
 import { PGlite } from '@electric-sql/pglite';
-import { serverEnv } from '../../utils/env/server';
+import { serverEnv } from '~/utils/env/server';
 import * as schema from './schema';
 import { DrizzleConfig, sql } from 'drizzle-orm';
 

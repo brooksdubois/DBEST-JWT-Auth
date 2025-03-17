@@ -73,7 +73,7 @@ In addition, `drizzle studio` can be used to connect to the database and browse,
 bun studio
 ```
 
-## Environment variables ([.env](.env.example))
+## Environment variables ([.env](.env))
 
 - `PORT`: port that the application runs on. Default: `3000`
 
