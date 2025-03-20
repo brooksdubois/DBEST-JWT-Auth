@@ -11,6 +11,7 @@ import { treaty } from '@elysiajs/eden';
 import { clientEnv } from '~/utils/env/client';
 import type { App } from './routes/api';
 import './app.css';
+import Layout from '~/components/Layout';
 
 export const { api } = treaty<App>(clientEnv.HOST_URL);
 
@@ -32,12 +33,14 @@ export default function App() {
   return (
     <Router
       root={(props) => (
-        <MetaProvider>
-          <Title>DBEST Stack</Title>
-          <QueryClientProvider client={queryClient}>
-            <Suspense>{props.children}</Suspense>
-          </QueryClientProvider>
-        </MetaProvider>
+        <Layout>
+          <MetaProvider>
+            <Title>DBEST Stack</Title>
+            <QueryClientProvider client={queryClient}>
+              <Suspense>{props.children}</Suspense>
+            </QueryClientProvider>
+          </MetaProvider>
+        </Layout>
       )}>
       <FileRoutes />
     </Router>

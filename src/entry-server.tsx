@@ -12,6 +12,7 @@ export default createHandler(() => (
             content={'width=device-width, initial-scale=1'}
           />
           <link rel={'icon'} href={'/favicon.ico'} />
+          <title>My Auth Tester</title>
           {assets}
         </head>
         <body>

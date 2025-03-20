@@ -1,13 +1,19 @@
 import { Create } from '@sinclair/typebox/value';
 import { createMutation, createQuery } from '@tanstack/solid-query';
-import { For, Show } from 'solid-js';
+import { For, onMount, Show } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { api } from '~/app';
 import Todo from '~/components/Todo';
 import { todoSchemas, todoInsertSchema } from '~/routes/api/todo/schema';
+import { checkAuthStatus } from '~/utils/globalAuth';
+import "../app.css";
 
 export default function Home() {
   const [todo, setTodo] = createStore(Create(todoInsertSchema));
+
+  onMount(async () => {
+    await checkAuthStatus(); // ✅ Check auth when app starts
+  });
 
   const todoQuery = createQuery(() => ({
     queryKey: ['todo'],
@@ -19,18 +25,16 @@ export default function Home() {
     onSuccess: () => setTodo(Create(todoInsertSchema)),
   }));
 
-  return (
+  return <>
     <div class={'mx-auto p-4 text-center text-gray-700'}>
       <Show when={todoQuery.data}>
-        {(todoList) => (
-          <For each={todoList()}>
+        {(todoList) => <For each={todoList()}>
             {(todo) => (
               <div class={'mb-2'}>
                 <Todo id={todo.id} data={todo.data} />
               </div>
             )}
-          </For>
-        )}
+          </For>}
       </Show>
       <br />
       <div class={'flex flex-row justify-center gap-4'}>
@@ -59,8 +63,6 @@ export default function Home() {
           Submit
         </button>
       </div>
-      <br />
-      <pre>DrizzleORM + Bun + ElysiaJS + SolidStart + Tailwind CSS</pre>
     </div>
-  );
+  </>;
 }

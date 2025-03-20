@@ -6,6 +6,13 @@ import { db } from '~/routes/api/db';
 import { eq } from "drizzle-orm";
 import "dotenv/config";
 import { cookie } from '@elysiajs/cookie';
+import { APIEvent } from '@solidjs/start/dist/server';
+
+interface CustomAPIEvent extends APIEvent {
+  body: { username: string, password: string };
+  jwt: { sign: any, verify: any };
+  set: any; error: any; cookie: { auth: any };
+}
 
 export const usersRoute = new Elysia()
   .use(
@@ -17,7 +24,7 @@ export const usersRoute = new Elysia()
   )
   .use(cookie())
   .post("/register", async ({ body }) => {
-    // @ts-ignore
+    // @ts-expect-error destructuring user pass
     const { username, password } = body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -27,12 +34,11 @@ export const usersRoute = new Elysia()
       return { success: true };
     } catch (err) {
       console.error("DB Insert Error:", err);
+      // @ts-expect-error destructuring error message
       return { error: err.message };
     }
-    return { success: true };
   })
-  .post("/login", async ({ body, jwt,  cookie: { auth } }) => {
-    // @ts-ignore
+  .post("/login", async ({ body, jwt, cookie: { auth } }: CustomAPIEvent) => {
     const { username, password } = body;
 
     try {
@@ -42,12 +48,13 @@ export const usersRoute = new Elysia()
         .where(eq(users.username, username))
         .limit(1);
 
+
       if (!user.length) return { error: "User not found" };
       const firstUser = user[0] ?? { id: "", password: "" };
       const valid = await bcrypt.compare(password, firstUser.password);
       if (!valid) return { error: "Invalid credentials" };
 
-      const token = await jwt.sign({ id: firstUser.id, username });
+      const token = await jwt?.sign({ id: firstUser.id, username });
       auth?.set({
         value: token,
         httpOnly: true,
@@ -59,14 +66,15 @@ export const usersRoute = new Elysia()
       return { token };
     } catch (err) {
       console.error("Select users error:", err);
+      // @ts-expect-error destructuring error message
       return { error: err.message  };
     }
-  }).post('/profile', async ({ jwt, error, cookie: { auth } }) => {
+  }).post('/profile', async ({ jwt, error, cookie: { auth } }: CustomAPIEvent) => {
     const profile = await jwt.verify(auth?.value)
 
     if (!profile) return error(401, 'Unauthorized')
     return `Hello ${profile.username}`
-  }).get("/me", async ({ jwt, request, set }) => {
+  }).get("/me", async ({ jwt, request, set }: CustomAPIEvent) => {
     const authHeader = request.headers.get("Authorization");
 
     if (!authHeader?.startsWith("Bearer ")) {
@@ -94,6 +102,7 @@ export const usersRoute = new Elysia()
       });
     } catch (err) {
       console.error("Logout Cookie Error:", err);
+      // @ts-expect-error destructuring error message
       return { error: err.message  };
     }
     return { message: "Logged out" };
